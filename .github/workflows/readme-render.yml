@@ -1,39 +1,38 @@
-name: Render README to Image
+name: Render README to Web Page
 
 on:
-  # 手动触发
   workflow_dispatch:
-  
-  # 当 README.md 被 push 到 main 或 master 分支时触发
   push:
     paths:
       - 'README.md'
     branches:
       - main
-      - master
 
 jobs:
   render:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     
     steps:
       - name: Checkout 仓库
         uses: actions/checkout@v4
       
-      - name: 安装 Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+      - name: 安装中文字体
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fonts-noto-cjk fonts-wqy-microhei
       
-      - name: 安装 md-to-png 工具
+      - name: 安装 md-to-png
         run: npm install -g md-to-png
       
-      - name: 将 README.md 渲染为 PNG
-        run: md-to-png README.md -o readme-preview.png
+      - name: 渲染 README
+        run: md-to-png README.md -o readme-preview.png --font "WenQuanYi Micro Hei"
       
-      - name: 上传产物（保留 7 天）
-        uses: actions/upload-artifact@v4
+      - name: 部署到 GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          name: readme-preview
-          path: readme-preview.png
-          retention-days: 7
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
+          publish_branch: gh-pages
+          keep_files: false
