@@ -1,14 +1,10 @@
-<p align="center">
-  <img src="icon.jpg" width="200" style="border-radius: 50%;" alt="logo"/>
-</p>
-
+![ValleyServer](https://socialify.git.ci/Lixeer/ValleyServer/image?description=1&font=KoHo&forks=1&issues=1&logo=https%3A%2F%2Fgithub.com%2FLixeer%2FValleyServer%2Fblob%2Fmain%2Ficon.jpg%3Fraw%3Dtrue&name=1&owner=1&pattern=Brick+Wall&pulls=1&stargazers=1&theme=Light)
 <div align="center">
 
-# ValleyServer  
-星露谷物语多人服务器解决方案  
+
 [简体中文](README.md) | [English](README_en.md)  
   
-[![visitors](https://visitor-badge.laobi.icu/badge?page_id=Lixeer.ValleyServer_sync)]() [![license](https://img.shields.io/github/license/Lixeer/ValleyServer)]() [![stars](https://img.shields.io/github/stars/Lixeer/ValleyServer)]()
+
 </div>
 
 
@@ -17,13 +13,9 @@
 
 ## 📋 项目概述
 - **项目原理**：  
-  通过自定义 `MOD` 实现农场的自动运行，例如自动睡觉、自动跳过剧情、自动关闭弹窗等功能，使游戏能够在无人值守的情况下持续进行。
+  通过自定义 `mod` 实现农场主人的自动运行，例如自动睡觉、自动跳过剧情、自动关闭弹窗等功能，使游戏能够在无人值守的情况下持续进行。并且提供稳定的容器化部署方案。
 
-- **注意事项**：  
-  本项目主要收录各类开服方案、服务器相关 `MOD`、以及用于维护无人值守服务器的 `MOD`。  
-  请不要在 `issues` 中催促开发者适配各类管理面板或容器化方案，这些需求由社区自行扩展和维护。  
-  若你拥有成熟的部署方案，欢迎通过 `PR` 提交以收录到本项目文档中。  
-  本仓库的 `issue` 仅受理与 `MOD` 功能相关的 `feature` 请求。
+
 
 ---
 
@@ -35,26 +27,16 @@
   社区持续维护与更新，欢迎提交 `issue` 与 `PR`！  
   相较于现有的无人值守类 `MOD`，本项目支持范围更广、更新更及时。
 
+
+- **集成控制面板**：  
+  在最新版的docker部署方案中，我们提供了一个简单美观的WebUI和WebVNC，更好的控制和管理服务器
+
 ---
 
 ## 🌻 快速开始
-1. 从 `Releases` 页面下载所需的 `MOD` 压缩包  
-2. 安装 `Stardew Valley` 与 `SMAPI`  
-3. 将下载的 `MOD` 放入游戏 `Mods` 文件夹  
-4. 运行 `StardewModdingAPI` 启动游戏  
-5. ~~根据需要配置网络（FRP / DDNS / 公网 IP 等），默认端口为 `24642`，协议为 `UDP`~~
-
-> ⚙️ **特殊场景运行技巧**
-- **无 GPU 环境运行**  
-  - Windows 环境可使用 **Mesa3D**  
-  - Linux 环境可使用 **Xvfb**  (极不稳定)
-  - 一键开服包可在 QQ 群内获取（见下方）
-
----
-
-- 📚 其他教程
-  - 🎥 [【星露谷物语开服 / 多人服务器 / 三端互通 / 远程联机教程】](https://www.bilibili.com/video/BV13VPJe6EM1/?share_source=copy_web&vd_source=dddc5d0c3c33183e95f30f7d1ccdb295)  
-  - 🧠 [【Linux 无头模式运行教程】](https://blog.csdn.net/2401_87565228/article/details/148801625?spm=1001.2014.3001.5501)
+  - [Docker for ValleyServer](oneclick-script/cookbook.md)
+  
+  
 
 ---
 ##  🧸 本项目维护中的MOD
@@ -81,13 +63,15 @@
 
 ## 🧰 致谢
 - [**SMAPI**](https://github.com/Pathoschild/StardewModdingAPI)：提供了游戏注入与扩展机制
-- [**圆心云计算**](https://tyteam.net)：为本项目提供了服务器托管服务   
+   
 
 ## 🤝 友情链接  
-- [**圆心云计算**](https://tyteam.net)：租赁服务器，成熟的，客制化运维方案，就选圆心云，一键开服
 - [**Stardew Valley**](https://www.stardewvalley.net)：星露谷物语游戏官网
 - [**Stardew-Valley-Mutiplayer-docker**](https://github.com/printfuck/stardew-multiplayer-docker)：星露谷物语多人游戏服务器docker部署
-> 如果您有成熟的部署方案，可以通过`PR`提交到本栏目，感谢您对社区的支持
+
+## 🎯 TODO
+- 编写真正的协议端而非依赖无头服务器 (**我们正在编写一个`agent`用来分析星露谷源码，总结协议文档，你可以在qq群或者`issue`中加入我们**)
+- 暂时不再考虑扩展的已有mod，但是希望有其他的联机玩法，例如类似`HayDay`的联网但不联机功能
 
 
 ## 🧮 Star History
