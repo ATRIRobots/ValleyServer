@@ -3,8 +3,18 @@ name: Build and Package ValleyServer
 on:
   push:
     branches: [ "main", "master" ]
+    paths:
+      - '**.cs'
+      - '**.csproj'
+      - '**.slnx'
+      - 'src/**'
   pull_request:
     branches: [ "main", "master" ]
+    paths:
+      - '**.cs'
+      - '**.csproj'
+      - '**.slnx'
+      - 'src/**'
   workflow_dispatch: # 支持在 GitHub 网页上手动点击触发构建
 
 jobs:
