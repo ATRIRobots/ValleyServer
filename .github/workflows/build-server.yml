@@ -1,0 +1,75 @@
+name: Build and Package ValleyServer
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch: # 支持在 GitHub 网页上手动点击触发构建
+
+jobs:
+  build-and-package:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 检出代码
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. 设置 .NET 8.0 SDK
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      # 3. 下载并解压资源文件到项目的 Content 目录中
+      # 此时资源文件夹会处于 src/ValleyServer/Content 目录下（与 csproj 中的配置匹配）
+      - name: Download and Extract Game Content
+        run: |
+          mkdir -p src/ValleyServer/Content
+          curl -L -o content.zip https://github.com/Lixeer/ValleyContent/releases/download/G1.6.15/Content.zip
+          unzip -q content.zip -d src/ValleyServer/Content
+          rm content.zip
+
+      # 4. 发布 Windows x64 独立运行版本（自带 .NET 运行时，生成可执行的 exe 文件）
+      - name: Publish Windows x64
+        run: |
+          dotnet publish src/ValleyServer/ValleyServer.csproj \
+            -c Release \
+            -r win-x64 \
+            --self-contained true \
+            -o publish/win-x64
+
+      # 5. 发布 Linux x64 独立运行版本（自带 .NET 运行时，生成可运行的二进制文件）
+      - name: Publish Linux x64
+        run: |
+          dotnet publish src/ValleyServer/ValleyServer.csproj \
+            -c Release \
+            -r linux-x64 \
+            --self-contained true \
+            -o publish/linux-x64
+
+      # 6. 打包 ZIP（可执行文件和 Content 文件夹同级处于压缩包根目录）
+      - name: Package Artifacts into ZIP
+        run: |
+          cd publish/win-x64
+          zip -r ../../ValleyServer-win-x64.zip .
+          cd ../../
+          
+          cd publish/linux-x64
+          zip -r ../../ValleyServer-linux-x64.zip .
+          cd ../../
+
+      # 7. 上传 Windows 构建包到 Artifacts 供下载
+      - name: Upload Windows Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: ValleyServer-win-x64
+          path: ValleyServer-win-x64.zip
+
+      # 8. 上传 Linux 构建包到 Artifacts 供下载
+      - name: Upload Linux Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: ValleyServer-linux-x64
+          path: ValleyServer-linux-x64.zip
