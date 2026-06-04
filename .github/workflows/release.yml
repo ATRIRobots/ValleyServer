@@ -1,0 +1,137 @@
+name: Auto Release
+
+on:
+  workflow_dispatch: # 支持在 GitHub 网页上手动点击按钮一键发版
+
+permissions:
+  contents: write # 必须赋予写权限以允许创建 Tag 和 Release
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 检出代码（深度设为 0 以获取完整 Git 历史计算版本）
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 2. 自动计算下一个版本号并打 Tag
+      - name: Calculate Next Version Tag
+        id: tag
+        run: |
+          git fetch --tags
+          # 寻找最新符合 v3.* 格式的 Tag
+          LATEST_TAG=$(git tag -l "v3.*" --sort=-v:refname | head -n 1)
+          
+          if [ -z "$LATEST_TAG" ]; then
+            NEW_TAG="v3.0.0"
+          else
+            VERSION=${LATEST_TAG#v} # 去除 v 前缀 -> 3.0.0
+            IFS='.' read -r -a parts <<< "$VERSION"
+            MAJOR=${parts[0]}
+            MINOR=${parts[1]}
+            PATCH=${parts[2]}
+            NEW_PATCH=$((PATCH + 1))
+            NEW_TAG="v${MAJOR}.${MINOR}.${NEW_PATCH}"
+          fi
+          
+          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+          
+          # 配置 Git 机器人账户并打上新 Tag 推送
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag $NEW_TAG
+          git push origin $NEW_TAG
+
+      # 3. 设置 .NET SDK
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      # 4. 下载并解压资源文件到项目的 Content 目录中
+      - name: Download and Extract Game Content
+        run: |
+          mkdir -p src/ValleyServer/Content
+          curl -L -o content.zip http://mzdkk.cn/pack
+          unzip -q content.zip -d src/ValleyServer/Content
+          rm content.zip
+
+      # 5. 发布 Windows x64 独立版本
+      - name: Publish Windows x64
+        run: |
+          dotnet publish src/ValleyServer/ValleyServer.csproj \
+            -c Release \
+            -r win-x64 \
+            --self-contained true \
+            -o publish/win-x64
+
+      # 6. 发布 Linux x64 独立版本
+      - name: Publish Linux x64
+        run: |
+          dotnet publish src/ValleyServer/ValleyServer.csproj \
+            -c Release \
+            -r linux-x64 \
+            --self-contained true \
+            -o publish/linux-x64
+
+      # 7. 打包 ZIP（可执行文件和 Content 同级处于压缩包根目录）
+      - name: Package Artifacts into ZIP
+        run: |
+          cd publish/win-x64
+          zip -r ../../ValleyServer-win-x64.zip .
+          cd ../../
+          
+          cd publish/linux-x64
+          zip -r ../../ValleyServer-linux-x64.zip .
+          cd ../../
+
+      # 8. 生成包含指定三栏目和 Emoji 的双语 Release 说明模板
+      - name: Generate Release Body Template
+        run: |
+          cat << 'EOF' > release_body.md
+          ## 🇨🇳 中文公告 (Chinese Announcement)
+
+          ### 🚀 特性更新
+          - 
+          - 
+
+          ### 🐛 Bug 修复
+          - 
+          - 
+
+          ### 🔧 其他变更
+          - 
+          - 
+
+          ---
+
+          ## 🇬🇧 English Announcement
+
+          ### 🚀 Features
+          - 
+          - 
+
+          ### 🐛 Bug Fixes
+          - 
+          - 
+
+          ### 🔧 Others
+          - 
+          - 
+          EOF
+
+      # 9. 创建 Release 并上传 ZIP 附件
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.NEW_TAG }}
+          name: 🌈${{ env.NEW_TAG }} release
+          body_path: release_body.md
+          draft: false
+          prerelease: false
+          files: |
+            ValleyServer-win-x64.zip
+            ValleyServer-linux-x64.zip
