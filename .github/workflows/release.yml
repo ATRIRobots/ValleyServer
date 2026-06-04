@@ -55,7 +55,7 @@ jobs:
       - name: Download and Extract Game Content
         run: |
           mkdir -p src/ValleyServer/Content
-          curl -L -o content.zip http://mzdkk.cn/pack
+          curl -L -o content.zip https://github.com/Lixeer/ValleyContent/releases/download/G1.6.15/Content.zip
           unzip -q content.zip -d src/ValleyServer/Content
           rm content.zip
 
