@@ -457,7 +457,7 @@ namespace HeadlessServer
             NetPeerConfiguration config = new NetPeerConfiguration("StardewValley");
             config.EnableMessageType(NetIncomingMessageType.DiscoveryRequest);
             config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
-            config.Port = 24642;
+            config.Port = 39924;
             config.ConnectionTimeout = 30f;
             config.PingInterval = 5f;
             config.MaximumConnections = 8 * 2;
